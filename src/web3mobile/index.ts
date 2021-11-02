@@ -72,7 +72,7 @@ async function sendTransaction(
       from,
       to,
       value,
-      gas: undefined,
+      gas: gas || undefined,
       data: data,
     })
     .on("transactionHash", (transactionHash: string) => {
