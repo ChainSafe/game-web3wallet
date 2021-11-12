@@ -1,10 +1,18 @@
 # Game Web3Mobile
 
+
 Link to this site to
 
 - Verify to Login
 
 - Send a transaction
+
+
+## Installation
+
+Run `yarn` or `npm install`
+
+Make a copy of `.env.template` and rename to `.env`
 
 ## Verify Login
 
