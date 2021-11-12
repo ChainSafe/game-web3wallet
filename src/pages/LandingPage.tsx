@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
+import { CenteredButton } from "../components/CenteredButton";
 import { useWeb3MobileContext } from "../context/Web3MobileProvider";
 import { useQuery } from "../hooks/useQuery";
+import { isAddress } from "../utils/address";
 
 const LandingPage = () => {
   let query = useQuery();
@@ -14,7 +16,7 @@ const LandingPage = () => {
   const [gas, setGas] = useState<string | undefined>()
 
   const [signature, setSignature] = useState<string | undefined>()
-
+  const [txHash, setTxHash] = useState<string | undefined>()
 
   // Collecting params
   useEffect(() => {
@@ -46,11 +48,7 @@ const LandingPage = () => {
     }
   }, [networkId, setOnboard, web3])
 
-
-  useEffect(() => {
-    console.log("signature", signature)
-    console.log("actionPending", actionPending)
-
+  const manualTrigger = useCallback(() => {
     if (web3 && !actionPending) {
       switch (action) {
         case "login":
@@ -59,15 +57,24 @@ const LandingPage = () => {
             signLoginMessage()
               .then(sig => setSignature(sig))
               .catch(() => {
-                console.log("fuck")
                 setSignature(undefined)
               })
+          } else {
+            console.log("Signature provided")
           }
           break;
         case "send":
-          if (to && value) {
-            console.log("sendTransaction", to, value, gas, data)
-            // sendTransaction(to, value, gas, data)
+          if (to && isAddress(to) && value) {
+            if (txHash === undefined) {
+              setTxHash("")
+              sendTransaction(to, value, gas, data) 
+                .then(txHash => setTxHash(txHash))
+                .catch(() => {
+                  setTxHash(undefined)
+                })
+            } else {
+              console.log("Tx submitted")
+            }
           } else {
             console.error("Invalid request")
           }
@@ -77,14 +84,23 @@ const LandingPage = () => {
           break;
       }
     }
-  }, [action, actionPending, data, gas, sendTransaction, signLoginMessage, signature, to, value, web3])
+  }, [action, actionPending, data, gas, sendTransaction, signLoginMessage, signature, to, txHash, value, web3])
+
+  useEffect(() => {
+    if (web3 && !actionPending) {
+      manualTrigger()
+    }
+  }, [actionPending, manualTrigger, web3])
+
+
+  const manualTriggerDisabled = !web3 || actionPending || (action === "login" && signature !== undefined) || (action === "send" && txHash !== undefined)
 
   return <div>
     <p>
       Web3 set: {`${web3 !== undefined}`}
     </p>
     <p>
-      Action Pending: {actionPending}
+      Action Pending: {`${actionPending}`}
     </p>
     <p>
       Network Id: {networkId}
@@ -104,6 +120,9 @@ const LandingPage = () => {
     <p>
       Data: {data}
     </p>
+    <CenteredButton disabled={manualTriggerDisabled} onClick={manualTrigger}>
+      {action}
+    </CenteredButton>
   </div>
 }
 

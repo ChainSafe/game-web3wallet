@@ -127,8 +127,6 @@ const Web3MobileProvider = ({ children }: Web3MobileProviderProps) => {
     })
     
   }, [web3, actionPending])
-  console.log(actionPending)
-
 
   return (
     <Web3MobileContext.Provider
