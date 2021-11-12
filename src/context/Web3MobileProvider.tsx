@@ -63,9 +63,7 @@ const Web3MobileProvider = ({ children }: Web3MobileProviderProps) => {
     if (!walletSelected) window.location.reload();
     await onboard.walletCheck();
     setInitialLogin(false)
-
   }, [initialLogin])
-
 
   const signLoginMessage = useCallback(async () => {
     if(!web3) return Promise.reject("web3 not set")

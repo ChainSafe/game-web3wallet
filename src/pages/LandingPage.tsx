@@ -13,6 +13,8 @@ const LandingPage = () => {
   const [data, setData] = useState<string | undefined>()
   const [gas, setGas] = useState<string | undefined>()
 
+  const [signature, setSignature] = useState<string | undefined>()
+
 
   // Collecting params
   useEffect(() => {
@@ -49,7 +51,7 @@ const LandingPage = () => {
     if (web3 && !actionPending) {
       switch (action) {
         case "login":
-          signLoginMessage()
+          !signature && signLoginMessage().then(sig => setSignature(sig))
           break;
         case "send":
           if (to && value) {
@@ -64,11 +66,11 @@ const LandingPage = () => {
           break;
       }
     }
-  }, [action, actionPending, data, gas, sendTransaction, signLoginMessage, to, value, web3])
+  }, [action, actionPending, data, gas, sendTransaction, signLoginMessage, signature, to, value, web3])
 
   return <div>
     <p>
-      Web3 set: {!!web3}
+      Web3 set: {`${web3 !== undefined}`}
     </p>
     <p>
       Action Pending: {actionPending}
