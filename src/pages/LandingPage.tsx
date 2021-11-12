@@ -4,6 +4,8 @@ import { useWeb3MobileContext } from "../context/Web3MobileProvider";
 import { useQuery } from "../hooks/useQuery";
 import { isAddress } from "../utils/address";
 
+const MAX_ATTEMPTS = 3
+
 const LandingPage = () => {
   let query = useQuery();
   const { actionPending, setOnboard, signLoginMessage, sendTransaction, web3 } = useWeb3MobileContext()
@@ -17,6 +19,8 @@ const LandingPage = () => {
 
   const [signature, setSignature] = useState<string | undefined>()
   const [txHash, setTxHash] = useState<string | undefined>()
+
+  const [attempt, setAttempt] = useState(0)
 
   // Collecting params
   useEffect(() => {
@@ -49,11 +53,12 @@ const LandingPage = () => {
   }, [networkId, setOnboard, web3])
 
   const manualTrigger = useCallback(() => {
-    if (web3 && !actionPending) {
+    if (web3 && !actionPending && attempt <= MAX_ATTEMPTS) {
       switch (action) {
         case "login":
           if (signature === undefined) {
             setSignature("")
+            setAttempt(attempt + 1)
             signLoginMessage()
               .then(sig => setSignature(sig))
               .catch(() => {
@@ -67,6 +72,7 @@ const LandingPage = () => {
           if (to && isAddress(to) && value) {
             if (txHash === undefined) {
               setTxHash("")
+              setAttempt(attempt + 1)
               sendTransaction(to, value, gas, data) 
                 .then(txHash => setTxHash(txHash))
                 .catch(() => {
@@ -84,7 +90,7 @@ const LandingPage = () => {
           break;
       }
     }
-  }, [action, actionPending, data, gas, sendTransaction, signLoginMessage, signature, to, txHash, value, web3])
+  }, [action, actionPending, attempt, data, gas, sendTransaction, signLoginMessage, signature, to, txHash, value, web3])
 
   useEffect(() => {
     if (web3 && !actionPending) {
@@ -92,8 +98,6 @@ const LandingPage = () => {
     }
   }, [actionPending, manualTrigger, web3])
 
-
-  const manualTriggerDisabled = !web3 || actionPending || (action === "login" && signature !== undefined) || (action === "send" && txHash !== undefined)
 
   return <div>
     <p>
@@ -120,9 +124,21 @@ const LandingPage = () => {
     <p>
       Data: {data}
     </p>
-    <CenteredButton disabled={manualTriggerDisabled} onClick={manualTrigger}>
-      {action}
-    </CenteredButton>
+    {
+      signature && signature !== "" && <a href={`unitydl://unity/${signature}`}>
+        <CenteredButton>
+          {action}
+        </CenteredButton>
+      </a>
+    }
+    {
+      txHash && txHash !== "" && <a href={`unitydl://unity/${txHash}`}>
+        <CenteredButton>
+          {action}
+        </CenteredButton>
+      </a>
+    }
+   
   </div>
 }
 
