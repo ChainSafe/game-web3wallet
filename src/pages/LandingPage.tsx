@@ -48,10 +48,21 @@ const LandingPage = () => {
 
 
   useEffect(() => {
+    console.log("signature", signature)
+    console.log("actionPending", actionPending)
+
     if (web3 && !actionPending) {
       switch (action) {
         case "login":
-          !signature && signLoginMessage().then(sig => setSignature(sig))
+          if (signature === undefined) {
+            setSignature("")
+            signLoginMessage()
+              .then(sig => setSignature(sig))
+              .catch(() => {
+                console.log("fuck")
+                setSignature(undefined)
+              })
+          }
           break;
         case "send":
           if (to && value) {

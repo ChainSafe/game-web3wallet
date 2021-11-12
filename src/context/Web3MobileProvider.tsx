@@ -67,16 +67,26 @@ const Web3MobileProvider = ({ children }: Web3MobileProviderProps) => {
 
   const signLoginMessage = useCallback(async () => {
     if(!web3) return Promise.reject("web3 not set")
+    if(actionPending) return Promise.reject("action pending")
     setActionPending(true)
     const from: string = (await web3.eth.getAccounts())[0];
-    const expiration: string = Math.round(Date.now() / 1000 + 300).toString();
-    const message: string = `${from}-${expiration}`;
-    const signature: string = await web3.eth.personal.sign(message, from, "");
-    const signedLoginMessge: string = `${signature}-${from}-${expiration}`;
-    console.log(signedLoginMessge);
-    setActionPending(false)
-    return signedLoginMessge
-  }, [web3])
+   
+    return new Promise<string>((resolve, reject) => {
+      const expiration: string = Math.round(Date.now() / 1000 + 300).toString();
+      const message: string = `${from}-${expiration}`;
+      web3.eth.personal.sign(message, from, "").then(signature => {
+        const signedLoginMessge: string = `${signature}-${from}-${expiration}`;
+        console.log(signedLoginMessge);
+        setActionPending(false)
+        resolve(signature)
+      }).catch(error => {
+        console.log("errr", error.message);
+        setActionPending(false)
+        reject(error.message)
+      })
+      
+    })
+  }, [web3, actionPending])
 
   /*
   const to = "0xB6B8bB1e16A6F73f7078108538979336B9B7341C"
@@ -92,9 +102,9 @@ const Web3MobileProvider = ({ children }: Web3MobileProviderProps) => {
     data?: string
   ) => {
     if(!web3) return Promise.reject("web3 not set")
+    if(actionPending) return Promise.reject("action pending")
     setActionPending(true)
     const from = (await web3.eth.getAccounts())[0];
-
     return new Promise<string>((resolve, reject) => {
       web3.eth
         .sendTransaction({
@@ -116,7 +126,9 @@ const Web3MobileProvider = ({ children }: Web3MobileProviderProps) => {
         });
     })
     
-  }, [web3])
+  }, [web3, actionPending])
+  console.log(actionPending)
+
 
   return (
     <Web3MobileContext.Provider
