@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script>var exports = {"__esModule": true};</script>
+    <script type="text/javascript" src="./main.js"></script>
+  
+    <title>Web3 Mobile</title>
+    <style>
+        #continue-button {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          display: block;
+          text-decoration: none;
+          transform: translate(-50%, 50%);
+          opacity: 0;
+          visibility: "hidden";
+          transition-duration: 200ms;
+        }
+
+        #continue-button.active {
+          opacity: 1;
+          visibility: "visible";
+        }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+      <a id="continue-button" href="unity://unity/asdasd" >
+        <button>
+          Continue
+        </button>
+      </a>
+    </div>
+  </body>
+</html>
