@@ -25,7 +25,7 @@ const LandingPage = () => {
   // Collecting params
   useEffect(() => {
     const _networkId = query.get("networkId")
-    setNetworkId(_networkId ? _networkId : undefined)
+    setNetworkId(_networkId ? _networkId : "1")
 
     const _action = query.get("action")
     setAction(_action ? _action : undefined)
@@ -100,30 +100,6 @@ const LandingPage = () => {
 
 
   return <div>
-    <p>
-      Web3 set: {`${web3 !== undefined}`}
-    </p>
-    <p>
-      Action Pending: {`${actionPending}`}
-    </p>
-    <p>
-      Network Id: {networkId}
-    </p>
-    <p>
-      Action: {action}
-    </p>
-    <p>
-      To: {to}
-    </p>
-    <p>
-      Value: {value}
-    </p>
-    <p>
-      Gas: {gas}
-    </p>
-    <p>
-      Data: {data}
-    </p>
     {
       signature && signature !== "" && <a href={`unitydl://unity/${signature}`}>
         <CenteredButton>
