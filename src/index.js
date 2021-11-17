@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime'
 import { ethers } from "ethers";
 import { parseUnits } from "ethers/lib/utils";
 let initialLogin = true;
@@ -7,19 +8,30 @@ const unityPrefix = "unity://unity/";
 let provider;
 let signer;
 
+let urlParams;
+
+let freshLoad  = false
+
 const loadApp = () => {
   // get params
   const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const action = urlParams.get("action");
+  urlParams = new URLSearchParams(queryString);
   let networkId = urlParams.get("networkId");
   networkId = networkId ? networkId : "1";
-  const to = urlParams.get("to");
-  const value = urlParams.get("value");
-  const data = urlParams.get("data") || "";
-  const gas = urlParams.get("gas") || undefined;
 
-  provider = new ethers.providers.Web3Provider(window.ethereum);
+  if (!freshLoad) {
+    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    freshLoad = true
+    // provider.on("network", (newNetwork, oldNetwork) => {
+    //   // When a Provider makes its initial connection, it emits a "network"
+    //   // event with a null oldNetwork along with the newNetwork. So, if the
+    //   // oldNetwork exists, it represents a changing network
+    //   console.log(newNetwork, oldNetwork)
+    //   if (oldNetwork) {
+    //     // loadApp()
+    //   }
+    // });
+  }
   if (provider.networkId !== networkId) {
     window.ethereum
       .request({
@@ -27,49 +39,48 @@ const loadApp = () => {
         params: [{ chainId: `0x${parseInt(networkId, 10).toString(16)}` }] // chainId must be in hexadecimal numbers
       })
       .then(() => {
-        // TODO: switch network crashes after swap
-        signer = provider.getSigner();
-        if (!signer) window.location.reload();
-        initialLogin = false;
-        provider
-          .send("eth_requestAccounts", [])
-          .then(() => {
-            if (action === "login") {
-              signLoginMessage();
-            }
-
-            if (action === "send" && to && value) {
-              sendTransaction(to, value, gas, data);
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        setSigner()
       })
       .catch((error) => {
         console.error(error);
-        window.location.reload();
+        // window.location.reload();
       });
   } else {
-    signer = provider.getSigner();
-    if (!signer) window.location.reload();
-    initialLogin = false;
-    provider
-      .send("eth_requestAccounts", [])
-      .then(() => {
-        if (action === "login") {
-          // signLoginMessage();
-        }
-
-        if (action === "send" && to && value) {
-          sendTransaction(to, value, gas, data);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    setSigner()
   }
 };
+
+const setSigner = () => {
+  signer = provider.getSigner();
+  if (!signer) window.location.reload();
+  initialLogin = false;
+  provider
+    .send("eth_requestAccounts", [])
+    .then(() => {
+      processAction()
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+const processAction = () => {
+  const action = urlParams.get("action");
+  if (action === "login") {
+    signLoginMessage();
+  }
+
+  const to = urlParams.get("to");
+  const value = urlParams.get("value");
+  const data = urlParams.get("data") || "";
+  const gas = urlParams.get("gas") || undefined;
+
+  if (action === "send" && to && value) {
+    sendTransaction(to, value, gas, data);
+  }
+}
+
+
 document.addEventListener("DOMContentLoaded", loadApp());
 
 /*
@@ -96,6 +107,13 @@ async function sendTransaction(to, value, gas, data) {
     .catch((error) => {
       console.log("errr", error.message);
     });
+  // .on("transactionHash", (transactionHash) => {
+  //   console.log("txhash", transactionHash);
+  //   setButton(transactionHash);
+  // })
+  // .on("error", (error) => {
+  //   console.log("errr", error.message);
+  // });
 }
 
 async function signLoginMessage() {

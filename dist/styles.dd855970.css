@@ -1,0 +1,22 @@
+body {
+  font-family: sans-serif;
+}
+
+#continue-button {
+  display: block;
+  text-decoration: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition-duration: 200ms;
+  opacity: 0;
+  visibility: hidden;
+}
+
+#continue-button.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/*# sourceMappingURL=/styles.dd855970.css.map */
