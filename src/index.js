@@ -1,6 +1,6 @@
 import 'regenerator-runtime/runtime'
 import { ethers } from "ethers";
-import { parseUnits } from "ethers/lib/utils";
+import { parseUnits, hexlify } from "ethers/lib/utils";
 let initialLogin = true;
 
 const unityPrefix = "unity://unity/";
@@ -73,10 +73,12 @@ const processAction = () => {
   const to = urlParams.get("to");
   const value = urlParams.get("value");
   const data = urlParams.get("data") || "";
-  const gas = urlParams.get("gas") || undefined;
+  // for non EIP-1559 transactions
+  const gasLimit = urlParams.get("gasLimit") || undefined;
+  const gasPrice = urlParams.get("gasLimit") || undefined;
 
   if (action === "send" && to && value) {
-    sendTransaction(to, value, gas, data);
+    sendTransaction(to, value, gasLimit, gasPrice, data);
   }
 }
 
@@ -86,18 +88,20 @@ document.addEventListener("DOMContentLoaded", loadApp());
 /*
 const to = "0xB6B8bB1e16A6F73f7078108538979336B9B7341C"
 const value = "12300000000000000"
-const gas = "21000"
+const gasLimit = "22222"
+const gasPrice = "3333333333333"
 const data = "0x"
 sendTransaction(to, value, gas, data);
 */
-async function sendTransaction(to, value, gas, data) {
+async function sendTransaction(to, value, gasLimit, gasPrice, data) {
   const from = await signer.getAddress();
   signer
     .sendTransaction({
       from,
       to,
-      value: parseUnits(value, 18),
-      gasLimit: parseUnits(gas, 0) || undefined,
+      value: parseUnits(value, "wei"),
+      gasLimit: gasLimit ? hexlify(Number(gasLimit)) : gasLimit,
+      gasPrice: gasPrice ? hexlify(Number(gasPrice)) : gasPrice,
       data: data ? data : "0x"
     })
     .then((transactionResponse) => {
