@@ -75,7 +75,7 @@ const processAction = () => {
   const data = urlParams.get("data") || "";
   // for non EIP-1559 transactions
   const gasLimit = urlParams.get("gasLimit") || undefined;
-  const gasPrice = urlParams.get("gasLimit") || undefined;
+  const gasPrice = urlParams.get("gasPrice") || undefined;
 
   if (action === "send" && to && value) {
     sendTransaction(to, value, gasLimit, gasPrice, data);
