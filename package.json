@@ -6,7 +6,7 @@
   "homepage": "https://chainsafe.github.io/game-web3mobile",
   "scripts": {
     "start": "parcel index.html --open",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html --public-url game-web3mobile"
   },
   "dependencies": {
     "ethers": "5.5.1",
@@ -18,6 +18,9 @@
   },
   "resolutions": {
     "@babel/preset-env": "7.13.8"
+  },
+  "engines": {
+    "parcel": "2.x"
   },
   "keywords": [
     "javascript",
