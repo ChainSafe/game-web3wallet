@@ -1,2 +1,0 @@
-(this["webpackJsonpgame-web3mobile"]=this["webpackJsonpgame-web3mobile"]||[]).push([[34],{1153:function(n,i){},1156:function(n,i){},1229:function(n,i){},1249:function(n,i){},1273:function(n,i){}}]);
-//# sourceMappingURL=34.ef123f6a.chunk.js.map
