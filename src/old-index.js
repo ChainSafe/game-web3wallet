@@ -1,10 +1,13 @@
-import Onboard from "bnc-onboard";
-import Web3 from "web3";
+import Onboard from "bnc-onboard"
+import Web3 from "web3"
+let web3
 
-let web3: Web3;
+let initialLogin = true;
 
-let initialLogin: boolean = true;
+// InnerHtml = action 
 
+const unityPrefix = "unity://unity/"
+console.log("asdasd")
 window.onload = async () => {
   // get params
   const queryString = window.location.search;
@@ -60,10 +63,10 @@ const data = "0x"
 sendTransaction(to, value, gas, data);
 */
 async function sendTransaction(
-  to: string,
-  value: string,
-  gas?: string,
-  data?: string
+  to,
+  value,
+  gas,
+  data
 ) {
 
   const from = (await web3.eth.getAccounts())[0];
@@ -75,19 +78,31 @@ async function sendTransaction(
       gas: gas || undefined,
       data: data,
     })
-    .on("transactionHash", (transactionHash: string) => {
-      console.log("txhahs", transactionHash);
+    .on("transactionHash", (transactionHash) => {
+      console.log("txhash", transactionHash);
+    setButton(transactionHash)
+
     })
-    .on("error", (error: any) => {
+    .on("error", (error) => {
       console.log("errr", error.message);
     });
 }
 
 async function signLoginMessage() {
-  const from: string = (await web3.eth.getAccounts())[0];
-  const expiration: string = Math.round(Date.now() / 1000 + 300).toString();
-  const message: string = `${from}-${expiration}`;
-  const signature: string = await web3.eth.personal.sign(message, from, "");
-  const signedLoginMessge: string = `${signature}-${from}-${expiration}`;
-  console.log(signedLoginMessge);
+  const from = (await web3.eth.getAccounts())[0];
+  const expiration = Math.round(Date.now() / 1000 + 300).toString();
+  const message = `${from}-${expiration}`;
+  const signature = await web3.eth.personal.sign(message, from, "");
+  const signedLoginMessage = `${signature}-${from}-${expiration}`;
+  console.log(signedLoginMessage);
+  setButton(signedLoginMessage)
 }
+
+
+const setButton = (href) => {
+  const target = document.getElementById("continue-button")
+  if (target) {
+    target.setAttribute("href", `${unityPrefix}${href}`)
+    target.className = "active"
+  }
+} 
