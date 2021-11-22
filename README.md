@@ -17,7 +17,7 @@ Link to this site to
 
 | Params         | Description           |
 |----------------|-----------------------|
-| &action=login | action to verify user |
+| &action=login  | action to verify user |
 
 example to login by signining a message: `http://localhost:1234/?action=login`
 
