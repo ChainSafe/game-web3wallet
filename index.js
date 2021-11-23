@@ -1,4 +1,4 @@
-import 'regenerator-runtime/runtime'
+import "regenerator-runtime/runtime";
 import { ethers } from "ethers";
 import { parseUnits, hexlify } from "ethers/lib/utils";
 let initialLogin = true;
@@ -10,7 +10,7 @@ let signer;
 
 let urlParams;
 
-let freshLoad  = false
+let freshLoad = false;
 
 const loadApp = () => {
   // get params
@@ -21,33 +21,26 @@ const loadApp = () => {
 
   if (!freshLoad) {
     provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    freshLoad = true
-    // provider.on("network", (newNetwork, oldNetwork) => {
-    //   // When a Provider makes its initial connection, it emits a "network"
-    //   // event with a null oldNetwork along with the newNetwork. So, if the
-    //   // oldNetwork exists, it represents a changing network
-    //   console.log(newNetwork, oldNetwork)
-    //   if (oldNetwork) {
-    //     // loadApp()
-    //   }
-    // });
+    freshLoad = true;
   }
-  if (provider.networkId !== networkId) {
-    window.ethereum
-      .request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${parseInt(networkId, 10).toString(16)}` }] // chainId must be in hexadecimal numbers
-      })
-      .then(() => {
-        setSigner()
-      })
-      .catch((error) => {
-        console.error(error);
-        // window.location.reload();
-      });
-  } else {
-    setSigner()
-  }
+
+  provider.getNetwork().then((network) => {
+    if (network.chainId !== networkId && urlParams.get("action") !== "login") {
+      window.ethereum
+        .request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: `0x${parseInt(networkId, 10).toString(16)}` }], // chainId must be in hexadecimal numbers
+        })
+        .then(() => {
+          setSigner();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      setSigner();
+    }
+  });
 };
 
 const setSigner = () => {
@@ -57,12 +50,12 @@ const setSigner = () => {
   provider
     .send("eth_requestAccounts", [])
     .then(() => {
-      processAction()
+      processAction();
     })
     .catch((error) => {
       console.error(error);
     });
-}
+};
 
 const processAction = () => {
   const action = urlParams.get("action");
@@ -80,8 +73,7 @@ const processAction = () => {
   if (action === "send" && to && value) {
     sendTransaction(to, value, gasLimit, gasPrice, data);
   }
-}
-
+};
 
 document.addEventListener("DOMContentLoaded", loadApp());
 
@@ -102,7 +94,7 @@ async function sendTransaction(to, value, gasLimit, gasPrice, data) {
       value: parseUnits(value, "wei"),
       gasLimit: gasLimit ? hexlify(Number(gasLimit)) : gasLimit,
       gasPrice: gasPrice ? hexlify(Number(gasPrice)) : gasPrice,
-      data: data ? data : "0x"
+      data: data ? data : "0x",
     })
     .then((transactionResponse) => {
       console.log("txhash", transactionResponse.hash);
