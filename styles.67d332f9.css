@@ -1,0 +1,2 @@
+body{font-family:sans-serif}#reponse-text{display:block;text-decoration:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);transition-duration:.2s;opacity:0;visibility:hidden}#reponse-text.active{opacity:1;visibility:visible}
+/*# sourceMappingURL=/game-web3mobile/styles.67d332f9.css.map */
