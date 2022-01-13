@@ -2,7 +2,7 @@ body {
   font-family: sans-serif;
 }
 
-#continue-button {
+#reponse-text {
   display: block;
   text-decoration: none;
   position: fixed;
@@ -14,7 +14,7 @@ body {
   visibility: hidden;
 }
 
-#continue-button.active {
+#reponse-text.active {
   opacity: 1;
   visibility: visible;
 }

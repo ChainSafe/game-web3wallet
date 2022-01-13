@@ -1,28 +1,23 @@
 import "regenerator-runtime/runtime";
 import { ethers } from "ethers";
 import { parseUnits, hexlify } from "ethers/lib/utils";
-let initialLogin = true;
-
-const unityPrefix = "unity://unity/";
 
 let provider;
 let signer;
-
 let urlParams;
 
-let freshLoad = false;
+document.addEventListener("DOMContentLoaded", loadApp());
 
-const loadApp = () => {
+function loadApp() {
+  // set clipboard to empty
+  navigator.clipboard.writeText("");
   // get params
   const queryString = window.location.search;
   urlParams = new URLSearchParams(queryString);
   let networkId = urlParams.get("networkId");
   networkId = networkId ? networkId : "1";
 
-  if (!freshLoad) {
-    provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    freshLoad = true;
-  }
+  provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 
   provider.getNetwork().then((network) => {
     if (network.chainId !== networkId && urlParams.get("action") !== "login") {
@@ -41,12 +36,11 @@ const loadApp = () => {
       setSigner();
     }
   });
-};
+}
 
-const setSigner = () => {
+function setSigner() {
   signer = provider.getSigner();
   if (!signer) window.location.reload();
-  initialLogin = false;
   provider
     .send("eth_requestAccounts", [])
     .then(() => {
@@ -55,27 +49,25 @@ const setSigner = () => {
     .catch((error) => {
       console.error(error);
     });
-};
+}
 
 const processAction = () => {
   const action = urlParams.get("action");
-  if (action === "login") {
-    signLoginMessage();
-  }
-
   const to = urlParams.get("to");
+  const message = urlParams.get("message");
   const value = urlParams.get("value");
   const data = urlParams.get("data") || "";
-  // for non EIP-1559 transactions
   const gasLimit = urlParams.get("gasLimit") || undefined;
   const gasPrice = urlParams.get("gasPrice") || undefined;
+
+  if (action === "sign" && message) {
+    signMessage(message);
+  }
 
   if (action === "send" && to && value) {
     sendTransaction(to, value, gasLimit, gasPrice, data);
   }
 };
-
-document.addEventListener("DOMContentLoaded", loadApp());
 
 /*
 const to = "0xB6B8bB1e16A6F73f7078108538979336B9B7341C"
@@ -86,46 +78,48 @@ const data = "0x"
 sendTransaction(to, value, gas, data);
 */
 async function sendTransaction(to, value, gasLimit, gasPrice, data) {
-  const from = await signer.getAddress();
-  signer
-    .sendTransaction({
+  try {
+    const from = await signer.getAddress();
+    const tx = await signer.sendTransaction({
       from,
       to,
       value: parseUnits(value, "wei"),
       gasLimit: gasLimit ? hexlify(Number(gasLimit)) : gasLimit,
       gasPrice: gasPrice ? hexlify(Number(gasPrice)) : gasPrice,
       data: data ? data : "0x",
-    })
-    .then((transactionResponse) => {
-      console.log("txhash", transactionResponse.hash);
-      setButton(transactionResponse.hash);
-    })
-    .catch((error) => {
-      console.log("errr", error.message);
     });
-  // .on("transactionHash", (transactionHash) => {
-  //   console.log("txhash", transactionHash);
-  //   setButton(transactionHash);
-  // })
-  // .on("error", (error) => {
-  //   console.log("errr", error.message);
-  // });
-}
-
-async function signLoginMessage() {
-  const from = await signer.getAddress();
-  const expiration = Math.round(Date.now() / 1000 + 300).toString();
-  const message = `${from}-${expiration}`;
-  const signature = await signer.signMessage(message);
-  const signedLoginMessage = `${signature}-${from}-${expiration}`;
-  console.log(signedLoginMessage);
-  setButton(signedLoginMessage);
-}
-
-const setButton = (href) => {
-  const target = document.getElementById("continue-button");
-  if (target) {
-    target.setAttribute("href", `${unityPrefix}${href}`);
-    target.className = "active";
+    console.log({ tx });
+    copyToClipboard(tx.hash);
+    displayResponse("Transaction Sent. Continue to App");
+  } catch (error) {
+    copyToClipboard("error");
+    displayResponse("Transaction Denied");
   }
-};
+}
+
+async function signMessage(message) {
+  try {
+    const signature = await signer.signMessage(message);
+    console.log({ signature });
+    copyToClipboard(signature);
+    displayResponse("Signature Complete. Continue to App");
+  } catch (error) {
+    copyToClipboard("error");
+    displayResponse("Signature Denied");
+  }
+}
+
+async function copyToClipboard(text) {
+  // focus from metamask back to browser
+  window.focus();
+  // wait to finish focus
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  // copy tx hash to clipboard
+  await navigator.clipboard.writeText(text);
+}
+
+function displayResponse(text) {
+  const target = document.getElementById("reponse-text");
+  target.innerHTML = text;
+  target.className = "active";
+}
