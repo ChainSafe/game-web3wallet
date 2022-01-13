@@ -79,6 +79,7 @@ sendTransaction(to, value, gas, data);
 */
 async function sendTransaction(to, value, gasLimit, gasPrice, data) {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const from = await signer.getAddress();
     const tx = await signer.sendTransaction({
       from,
@@ -99,6 +100,7 @@ async function sendTransaction(to, value, gasLimit, gasPrice, data) {
 
 async function signMessage(message) {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const signature = await signer.signMessage(message);
     console.log({ signature });
     copyToClipboard(signature);
