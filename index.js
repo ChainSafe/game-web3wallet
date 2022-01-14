@@ -14,17 +14,17 @@ function loadApp() {
   // get params
   const queryString = window.location.search;
   urlParams = new URLSearchParams(queryString);
-  let networkId = urlParams.get("networkId");
-  networkId = networkId ? networkId : "1";
+  let chainId = urlParams.get("chainId");
+  chainId = chainId ? chainId : "1";
 
   provider = new ethers.providers.Web3Provider(window.ethereum, "any");
 
   provider.getNetwork().then((network) => {
-    if (network.chainId !== networkId && urlParams.get("action") !== "login") {
+    if (network.chainId !== chainId && urlParams.get("action") !== "login") {
       window.ethereum
         .request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: `0x${parseInt(networkId, 10).toString(16)}` }], // chainId must be in hexadecimal numbers
+          params: [{ chainId: `0x${parseInt(chainId, 10).toString(16)}` }], // chainId must be in hexadecimal numbers
         })
         .then(() => {
           setSigner();
@@ -63,6 +63,8 @@ const processAction = () => {
   if (action === "sign" && message) {
     signMessage(message);
   }
+
+  console.log({to, value, gasLimit, gasPrice, data})
 
   if (action === "send" && to && value) {
     sendTransaction(to, value, gasLimit, gasPrice, data);
