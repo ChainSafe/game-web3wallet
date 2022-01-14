@@ -4,82 +4,49 @@ import { parseUnits, hexlify } from "ethers/lib/utils";
 
 let provider;
 let signer;
-let urlParams;
 
 document.addEventListener("DOMContentLoaded", loadApp());
 
-function loadApp() {
-  // set clipboard to empty
-  navigator.clipboard.writeText("");
-  // get params
-  const queryString = window.location.search;
-  urlParams = new URLSearchParams(queryString);
-  let chainId = urlParams.get("chainId");
-  chainId = chainId ? chainId : "1";
-
+async function loadApp() {
   provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-
-  provider.getNetwork().then((network) => {
-    if (network.chainId !== chainId && urlParams.get("action") !== "login") {
-      window.ethereum
-        .request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: `0x${parseInt(chainId, 10).toString(16)}` }], // chainId must be in hexadecimal numbers
-        })
-        .then(() => {
-          setSigner();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } else {
-      setSigner();
-    }
-  });
-}
-
-function setSigner() {
   signer = provider.getSigner();
   if (!signer) window.location.reload();
-  provider
-    .send("eth_requestAccounts", [])
-    .then(() => {
-      processAction();
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  await provider.send("eth_requestAccounts", []);
+  processAction();
 }
 
 function processAction() {
+  const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get("action");
-  const to = urlParams.get("to");
   const message = urlParams.get("message");
+  const chainId = urlParams.get("chainId") || 1;
+  const to = urlParams.get("to");
   const value = urlParams.get("value");
   const data = urlParams.get("data") || "";
   const gasLimit = urlParams.get("gasLimit") || undefined;
   const gasPrice = urlParams.get("gasPrice") || undefined;
 
   if (action === "sign" && message) {
-    signMessage(message);
+    return signMessage(message);
   }
 
   if (action === "send" && to && value) {
-    sendTransaction(to, value, gasLimit, gasPrice, data);
+    return sendTransaction(chainId, to, value, gasLimit, gasPrice, data);
   }
+
+  displayResponse("Invalid URL");
 }
 
-/*
-const to = "0xB6B8bB1e16A6F73f7078108538979336B9B7341C"
-const value = "12300000000000000"
-const gasLimit = "22222"
-const gasPrice = "3333333333333"
-const data = "0x"
-sendTransaction(to, value, gas, data);
-*/
-async function sendTransaction(to, value, gasLimit, gasPrice, data) {
+async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
   try {
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    const network = await provider.getNetwork();
+    if (network.chainId !== chainId) {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: `0x${parseInt(chainId, 10).toString(16)}` }], // chainId must be in hexadecimal numbers
+      });
+    }
     const from = await signer.getAddress();
     const tx = await signer.sendTransaction({
       from,
