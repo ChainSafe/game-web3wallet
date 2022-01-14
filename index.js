@@ -64,8 +64,6 @@ const processAction = () => {
     signMessage(message);
   }
 
-  console.log({to, value, gasLimit, gasPrice, data})
-
   if (action === "send" && to && value) {
     sendTransaction(to, value, gasLimit, gasPrice, data);
   }
