@@ -51,7 +51,7 @@ function setSigner() {
     });
 }
 
-const processAction = () => {
+function processAction() {
   const action = urlParams.get("action");
   const to = urlParams.get("to");
   const message = urlParams.get("message");
@@ -67,7 +67,7 @@ const processAction = () => {
   if (action === "send" && to && value) {
     sendTransaction(to, value, gasLimit, gasPrice, data);
   }
-};
+}
 
 /*
 const to = "0xB6B8bB1e16A6F73f7078108538979336B9B7341C"
