@@ -1,4 +1,6 @@
-# Game Web3Mobile
+# Game Web3 Wallet
+
+Unity Wallet. Build iOS, Android and Desktop.
 
 Link to this site to
 

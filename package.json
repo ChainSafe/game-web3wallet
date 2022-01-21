@@ -1,12 +1,12 @@
 {
-  "name": "game-web3mobile",
+  "name": "game-web3wallet",
   "version": "0.1.0",
   "private": true,
   "main": "index.html",
-  "homepage": "https://chainsafe.github.io/game-web3mobile",
+  "homepage": "https://chainsafe.github.io/game-web3wallet",
   "scripts": {
     "start": "parcel index.html --open",
-    "build": "parcel build index.html --public-url /game-web3mobile"
+    "build": "parcel build index.html --public-url /game-web3wallet"
   },
   "dependencies": {
     "ethers": "5.5.1",
