@@ -1,20 +1,49 @@
-body {
-  font-family: sans-serif;
+* {
+  font-family: Euclid, sans-serif;
 }
 
-#reponse-text {
+.center {
   display: block;
   text-decoration: none;
+  text-align: center;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+#response-text {
   transition-duration: 200ms;
   opacity: 0;
   visibility: hidden;
 }
 
-#reponse-text.active {
+#response-text.active {
   opacity: 1;
   visibility: visible;
+}
+
+#response-button {
+  border: none;
+  transition-duration: 200ms;
+  opacity: 0;
+  visibility: hidden;
+  background-color: white;
+  border: 1px solid #037dd6;
+  font-weight: bold;
+  color: #037dd6;
+  border-radius: 100px;
+  margin: 10px;
+  height: 45px;
+  width: 170px;
+}
+
+#response-button.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#response-button:hover {
+  cursor: pointer;
+  box-shadow: lightgray 0px 0px 10px;
 }
