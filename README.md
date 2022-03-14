@@ -19,7 +19,7 @@ Link to this site to
 | Params          | Description           |
 | --------------- | --------------------- |
 | &action=sign    | action to verify user |
-| &action=message | message to sign       |
+| &message=hello  | message to sign       |
 
 example to sign a message: `http://localhost:1234/?action=sign&message=helloworld`
 
