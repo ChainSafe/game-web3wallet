@@ -12,6 +12,17 @@
   transform: translate(-50%, -50%);
 }
 
+#logo {
+  max-width: 125px;
+  max-height: 125px;
+  margin: 15px auto;
+}
+
+#logo img {
+  height: 100%;
+  width: 100%;
+}
+
 #response-text {
   transition-duration: 200ms;
   opacity: 0;
@@ -34,6 +45,7 @@
   color: #037dd6;
   border-radius: 100px;
   margin: 10px;
+  margin-top: 21px;
   height: 45px;
   width: 170px;
 }
