@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.html",
-  "homepage": "https://canberksahin.github.io/game-web3wallet/",
+  "homepage": "https://canberksahin.github.io/web3ilebaglan/",
   "scripts": {
     "start": "parcel index.html --open",
-    "build": "parcel build ./index.html --public-url /game-web3wallet --target node --bundle-node-modules --out-dir ./dist --no-minify --out-file index.html"
+    "build": "parcel build ./index.html --public-url /web3ilebaglan --target node --bundle-node-modules --out-dir ./dist --no-minify --out-file index.html"
   }, 
   "dependencies": {
     "ethers": "5.5.1",
