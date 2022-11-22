@@ -20,7 +20,8 @@
     "@babel/preset-env": "7.13.8"
   },
   "engines": {
-    "parcel": "2.x"
+    "parcel": "2.x",
+    "node" : ">=16.0.0 <17.0.0"
   },
   "keywords": [
     "javascript",
