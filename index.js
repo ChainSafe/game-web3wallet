@@ -34,7 +34,7 @@ function processAction() {
     return sendTransaction(chainId, to, value, gasLimit, gasPrice, data);
   }
 
-  displayResponse("Invalid URL");
+  displayResponse("Geçersiz URL");
 }
 
 async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
@@ -69,7 +69,7 @@ async function signMessage(message) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const signature = await signer.signMessage(message);
     console.log({ signature });
-    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
+    displayResponse("İmzalama İşlemi Tamamlandı.<br><br>Kopyalama İşlemi Sonrasında Uygulamaya Geri Dönebilirsiniz.", signature);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
