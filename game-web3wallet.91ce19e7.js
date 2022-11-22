@@ -30552,4 +30552,4 @@ function displayResponse(text, response) {
   }
 }
 },{"regenerator-runtime/runtime":"KA2S","ethers":"iS6H","ethers/lib/utils":"if8b"}]},{},["Focm"], null)
-//# sourceMappingURL=/game-web3wallet.91ce19e7.js.map
+//# sourceMappingURL=/game-web3wallet/game-web3wallet.91ce19e7.js.map
