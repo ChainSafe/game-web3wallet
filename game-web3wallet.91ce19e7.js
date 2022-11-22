@@ -30524,7 +30524,7 @@ async function copyToClipboard(response) {
 
     await navigator.clipboard.writeText(response);
     document.getElementById("response-button").innerHTML = "Copied";
-  } catch (_unused) {
+  } catch {
     // for metamask mobile android
     const input = document.createElement("input");
     input.type = "text";
@@ -30552,4 +30552,4 @@ function displayResponse(text, response) {
   }
 }
 },{"regenerator-runtime/runtime":"KA2S","ethers":"iS6H","ethers/lib/utils":"if8b"}]},{},["Focm"], null)
-//# sourceMappingURL=/game-web3wallet.b9ace9ab.js.map
+//# sourceMappingURL=/game-web3wallet.91ce19e7.js.map
