@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.html",
-  "homepage": "https://canberksahin.github.io/game-web3wallet",
+  "homepage": "https://chainsafe.github.io/game-web3wallet",
   "scripts": {
     "start": "parcel index.html --open",
-    "build": "parcel build index.html --public-url /game-web3wallet"
+    "build": "parcel build ./index.html --target node --bundle-node-modules --out-dir ./dist --no-minify --out-file index.html"
   },
   "dependencies": {
     "ethers": "5.5.1",
