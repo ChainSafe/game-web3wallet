@@ -30467,12 +30467,12 @@ async function processAction() {
   if(action === "auth" && message) {
     let myAddress = await signer.getAddress();
     //get the signing message using the message
-    let msg = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
+    let response = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
         {
             method:'POST'
         }
     );
-    let jsonData = await msg.json();
+    let jsonData = await response.json();
     console.log(JSON.stringify(jsonData));
     return signMessage(jsonData.message);
   }
