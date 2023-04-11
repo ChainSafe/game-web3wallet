@@ -30521,7 +30521,8 @@ async function signMessage(message) {
     console.log({
       signature
     });
-    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
+    let signatureResponse = { signature: signature, message: message };
+    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signatureResponse.toString());
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
