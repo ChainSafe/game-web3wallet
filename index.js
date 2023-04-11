@@ -15,7 +15,7 @@ async function loadApp() {
   processAction();
 }
 
-function processAction() {
+async function processAction() {
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get("action");
   const message = urlParams.get("message");
@@ -32,6 +32,17 @@ function processAction() {
 
   if (action === "send" && to && value) {
     return sendTransaction(chainId, to, value, gasLimit, gasPrice, data);
+  }
+
+  if(action === "auth" && message) {
+    let myAddress = await signer.getAddress();
+    //get the signing message using the message
+    let msg = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
+        {
+            method:'POST'
+        }
+    );
+    return signMessage(msg.message);
   }
 
   displayResponse("Invalid URL");
