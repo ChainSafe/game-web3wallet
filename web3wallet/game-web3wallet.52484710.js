@@ -30463,6 +30463,13 @@ function processAction() {
   if (action === "send" && to && value) {
     return sendTransaction(chainId, to, value, gasLimit, gasPrice, data);
   }
+  
+  if(action === "auth" && message) {
+    let myAddress = signer.getAddress();
+    //get the signing message using the message
+    let signMessage = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001')
+    return signMessage(signMessage);
+  }
 
   displayResponse("Invalid URL");
 }
