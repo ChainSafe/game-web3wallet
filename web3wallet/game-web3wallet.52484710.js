@@ -30474,7 +30474,7 @@ async function processAction() {
     );
     let jsonData = await response.json();
     console.log(jsonData.result.message);
-    return signMessage(jsonData.result.message);
+    return authSignMessage(jsonData.result.message);
   }
 
   displayResponse("Invalid URL");
@@ -30514,6 +30514,21 @@ async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
   }
 }
 
+async function authSignMessage(message) {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const signature = await signer.signMessage(message);
+      console.log({
+        signature
+      });
+      const response = {signature, message};
+      displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", JSON.stringify(response));
+    } catch (error) {
+      copyToClipboard("error");
+      displayResponse("Signature Denied");
+    }
+  }
+
 async function signMessage(message) {
   try {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -30521,8 +30536,7 @@ async function signMessage(message) {
     console.log({
       signature
     });
-    let signatureResponse = { signature: signature, message: message };
-    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signatureResponse.toString());
+    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
