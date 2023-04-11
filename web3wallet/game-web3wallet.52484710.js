@@ -30465,7 +30465,7 @@ async function processAction() {
   }
 
   if(action === "auth" && message) {
-    let myAddress = signer.getAddress();
+    let myAddress = await signer.getAddress();
     //get the signing message using the message
     let msg = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
         {
