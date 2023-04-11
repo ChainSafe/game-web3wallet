@@ -30473,8 +30473,8 @@ async function processAction() {
         }
     );
     let jsonData = await response.json();
-    console.log(JSON.stringify(jsonData));
-    return signMessage(jsonData.message);
+    console.log(jsonData.result.message);
+    return signMessage(jsonData.result.message);
   }
 
   displayResponse("Invalid URL");
