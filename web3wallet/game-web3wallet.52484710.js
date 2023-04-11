@@ -30467,13 +30467,14 @@ async function processAction() {
   if(action === "auth" && message) {
     let myAddress = await signer.getAddress();
     //get the signing message using the message
-    let msg = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
+    await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
         {
             method:'POST'
         }
-    );
-    console.log(JSON.stringify(msg));
-    return signMessage(msg.body.message);
+    ).then(res => {
+        console.log(JSON.stringify(res));
+        return signMessage(res.json().message);
+    });
   }
 
   displayResponse("Invalid URL");
