@@ -30472,7 +30472,8 @@ async function processAction() {
             method:'POST'
         }
     );
-    return signMessage(msg.message);
+    console.log(JSON.stringify(msg));
+    return signMessage(msg.body.message);
   }
 
   displayResponse("Invalid URL");
