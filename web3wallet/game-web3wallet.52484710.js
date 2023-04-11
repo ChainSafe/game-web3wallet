@@ -30522,7 +30522,7 @@ async function signMessage(message) {
       signature
     });
     let signatureResponse = { signature: signature, message: message };
-    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signatureResponse.toString());
+    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", JSON.stringify(signatureResponse));
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
