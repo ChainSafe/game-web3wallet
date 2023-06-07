@@ -18,7 +18,6 @@ async function loadApp() {
 function processAction() {
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get("action");
-  const message = urlParams.get("message");
   const chainId = urlParams.get("chainId") || 1;
   const to = urlParams.get("to");
   const value = urlParams.get("value");
@@ -26,8 +25,18 @@ function processAction() {
   const gasLimit = urlParams.get("gasLimit") || undefined;
   const gasPrice = urlParams.get("gasPrice") || undefined;
 
+  // Signatures
+  const message = urlParams.get("message");
+  // EIP712
+  const domain = urlParams.get("domain") || undefined;
+  const types = urlParams.get("types") || undefined;
+
   if (action === "sign" && message) {
     return signMessage(message);
+  }
+
+  if (action === "sign-typed-data" && domain && types && message) {
+    return signTypedMessage(types, domain, message);
   }
 
   if (action === "send" && to && value) {
@@ -70,6 +79,18 @@ async function signMessage(message) {
     const signature = await signer.signMessage(message);
     console.log({ signature });
     displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
+  } catch (error) {
+    copyToClipboard("error");
+    displayResponse("Signature Denied");
+  }
+}
+
+async function signTypedMessage(types, domain, message) {
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const signature = await signer._signTypedData(domain, types, message)
+    console.log({ signature });
+    displayResponse("ignature complete.<br><br>Copy to clipboard then continue to App", signature);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
