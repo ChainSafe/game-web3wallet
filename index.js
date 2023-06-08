@@ -88,9 +88,9 @@ async function signMessage(message) {
 async function signTypedMessage(types, domain, message) {
   try {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const signature = await signer._signTypedData(domain, types, message)
+    const signature = await signer._signTypedData(JSON.parse(domain), JSON.parse(types), JSON.parse(message))
     console.log({ signature });
-    displayResponse("ignature complete.<br><br>Copy to clipboard then continue to App", signature);
+    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
