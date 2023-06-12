@@ -30448,16 +30448,24 @@ async function loadApp() {
 function processAction() {
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get("action");
-  const message = urlParams.get("message");
   const chainId = urlParams.get("chainId") || 1;
   const to = urlParams.get("to");
   const value = urlParams.get("value");
   const data = urlParams.get("data") || "";
   const gasLimit = urlParams.get("gasLimit") || undefined;
-  const gasPrice = urlParams.get("gasPrice") || undefined;
+  const gasPrice = urlParams.get("gasPrice") || undefined; // Signatures
+
+  const message = urlParams.get("message"); // EIP712
+
+  const domain = urlParams.get("domain") || undefined;
+  const types = urlParams.get("types") || undefined;
 
   if (action === "sign" && message) {
     return signMessage(message);
+  }
+
+  if (action === "sign-typed-data" && domain && types && message) {
+    return signTypedMessage(types, domain, message);
   }
 
   if (action === "send" && to && value) {
@@ -30515,6 +30523,20 @@ async function signMessage(message) {
   }
 }
 
+async function signTypedMessage(types, domain, message) {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const signature = await signer._signTypedData(JSON.parse(domain), JSON.parse(types), JSON.parse(message));
+    console.log({
+      signature
+    });
+    displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
+  } catch (error) {
+    copyToClipboard("error");
+    displayResponse("Signature Denied");
+  }
+}
+
 async function copyToClipboard(response) {
   try {
     // focus from metamask back to browser
@@ -30552,4 +30574,4 @@ function displayResponse(text, response) {
   }
 }
 },{"regenerator-runtime/runtime":"KA2S","ethers":"iS6H","ethers/lib/utils":"if8b"}]},{},["Focm"], null)
-//# sourceMappingURL=/game-web3wallet/game-web3wallet.91ce19e7.js.map
+//# sourceMappingURL=/game-web3wallet/game-web3wallet.997928f0.js.map
