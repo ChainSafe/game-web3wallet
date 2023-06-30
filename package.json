@@ -7,10 +7,15 @@
   "scripts": {
     "start": "parcel index.html --open",
     "build": "parcel build ./index.html --public-url /web3wallet --target node --bundle-node-modules --out-dir ./dist --no-minify --out-file index.html"
-  }, 
+  },
   "dependencies": {
+    "@wagmi/core": "^1.3.3",
+    "@web3modal/ethereum": "^2.6.2",
+    "@web3modal/html": "^2.6.2",
     "ethers": "5.5.1",
-    "parcel-bundler": "^1.6.1"
+    "parcel-bundler": "^1.6.1",
+    "viem": "^1.2.5",
+    "wagmi": "^1.3.3"
   },
   "devDependencies": {
     "@babel/core": "7.2.0",
@@ -21,7 +26,7 @@
   },
   "engines": {
     "parcel": "2.x",
-    "node" : ">=16.0.0 <17.0.0"
+    "node": ">=16.0.0 <17.0.0"
   },
   "keywords": [
     "javascript",

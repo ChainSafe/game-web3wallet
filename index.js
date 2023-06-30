@@ -1,18 +1,33 @@
-import "regenerator-runtime/runtime";
-import { ethers } from "ethers";
-import { parseUnits, hexlify } from "ethers/lib/utils";
+import { EthereumClient, w3mConnectors, w3mProvider } from '@web3modal/ethereum'
+import { Web3Modal } from '@web3modal/html'
+import { configureChains, createConfig, getAccount, getNetwork, signMessage, sendTransaction, switchNetwork } from '@wagmi/core'
+import { arbitrum, mainnet, polygon } from '@wagmi/core/chains'
 
-let provider;
-let signer;
+const chains = [arbitrum, mainnet, polygon]
+const projectId = '8cb9d988c38d5dafd5fbe1f639fd6ff7'
+
+const { publicClient } = configureChains(chains, [w3mProvider({ projectId })])
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: w3mConnectors({ projectId, chains }),
+  publicClient
+})
+const ethereumClient = new EthereumClient(wagmiConfig, chains)
+const web3modal = new Web3Modal({ projectId }, ethereumClient)
+
+var _utils = require("ethers/lib/utils");
 
 document.addEventListener("DOMContentLoaded", loadApp());
 
 async function loadApp() {
-  provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-  signer = provider.getSigner();
-  if (!signer) window.location.reload();
-  await provider.send("eth_requestAccounts", []);
-  processAction();
+    if(getAccount().isConnected){
+        processAction();
+    }
+    else{
+        await web3modal.openModal();
+        //wait for connection
+        web3modal.subscribeModal(newState => processAction())
+    }
 }
 
 async function processAction() {
@@ -27,47 +42,52 @@ async function processAction() {
   const gasPrice = urlParams.get("gasPrice") || undefined;
 
   if (action === "sign" && message) {
-    return signMessage(message);
+    return signWagmiMessage(message);
   }
 
   if (action === "send" && to && value) {
-    return sendTransaction(chainId, to, value, gasLimit, gasPrice, data);
+    return sendWagmiTransaction(chainId, to, value, gasLimit, gasPrice, data);
   }
 
   if(action === "auth" && message) {
-    let myAddress = await signer.getAddress();
+    let myAddress = getAccount();
     //get the signing message using the message
-    let msg = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
+    let response = await fetch(message + '/functions/requestMessage?address=' + myAddress + '&chain=001',
         {
             method:'POST'
         }
     );
-    return signMessage(msg.message);
+    let jsonData = await response.json();
+    console.log(jsonData.result.message);
+    return authSignMessage(jsonData.result.message);
   }
 
   displayResponse("Invalid URL");
 }
 
-async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
+async function sendWagmiTransaction(chainId, to, value, gasLimit, gasPrice, data) {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const network = await provider.getNetwork();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const network = await getNetwork();
+
     if (network.chainId !== chainId) {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${parseInt(chainId, 10).toString(16)}` }], // chainId must be in hexadecimal numbers
+      await switchNetwork({
+          chainId: `0x${parseInt(chainId, 10).toString(16)}`
       });
     }
-    const from = await signer.getAddress();
-    const tx = await signer.sendTransaction({
+
+    const from = getAccount();
+    const tx = await sendTransaction({
       from,
       to,
-      value: parseUnits(value, "wei"),
-      gasLimit: gasLimit ? hexlify(Number(gasLimit)) : gasLimit,
-      gasPrice: gasPrice ? hexlify(Number(gasPrice)) : gasPrice,
-      data: data ? data : "0x",
+      value: (0, _utils.parseUnits)(value, "wei"),
+      gasLimit: gasLimit ? (0, _utils.hexlify)(Number(gasLimit)) : gasLimit,
+      gasPrice: gasPrice ? (0, _utils.hexlify)(Number(gasPrice)) : gasPrice,
+      data: data ? data : "0x"
     });
-    console.log({ tx });
+    console.log({
+      tx
+    });
     displayResponse("Transaction sent.<br><br>Copy to clipboard then continue to App", tx.hash);
   } catch (error) {
     copyToClipboard("error");
@@ -75,13 +95,31 @@ async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
   }
 }
 
-async function signMessage(message) {
+async function authSignMessage(message) {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const signature = await signMessage(message);
+      console.log({
+        signature
+      });
+      const response = {signature, message};
+      displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", JSON.stringify(response));
+    } catch (error) {
+      copyToClipboard("error");
+      displayResponse("Signature Denied");
+    }
+  }
+
+async function signWagmiMessage(message) {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const signature = await signer.signMessage(message);
-    console.log({ signature });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const signature = await signMessage(message);
+    console.log({
+      signature
+    });
     displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
   } catch (error) {
+    console.log("error: " + JSON.stringify(error))
     copyToClipboard("error");
     displayResponse("Signature Denied");
   }
@@ -90,10 +128,10 @@ async function signMessage(message) {
 async function copyToClipboard(response) {
   try {
     // focus from metamask back to browser
-    window.focus();
-    // wait to finish focus
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    // copy tx hash to clipboard
+    window.focus(); // wait to finish focus
+
+    await new Promise(resolve => setTimeout(resolve, 500)); // copy tx hash to clipboard
+
     await navigator.clipboard.writeText(response);
     document.getElementById("response-button").innerHTML = "Copied";
   } catch {
@@ -119,6 +157,7 @@ function displayResponse(text, response) {
     // display button to copy tx.hash or signature
     const responseButton = document.getElementById("response-button");
     responseButton.className = "active";
+
     responseButton.onclick = () => copyToClipboard(response);
   }
 }
