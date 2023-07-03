@@ -11,8 +11,19 @@ async function loadApp() {
   provider = new ethers.providers.Web3Provider(window.ethereum, "any");
   signer = provider.getSigner();
   if (!signer) window.location.reload();
-  await provider.send("eth_requestAccounts", []);
+  await requestAccounts();
   processAction();
+}
+
+async function requestAccounts() {
+  const p1 = provider.send("eth_requestAccounts", []);
+  const p2 = new Promise((_r, rej) => setTimeout(() => rej("timed out"), 20000)); // timeout of 20 seconds
+
+  try {
+    await Promise.race([p1, p2]);
+  } catch (error) {
+    window.location.reload();
+  }
 }
 
 function processAction() {
