@@ -15,7 +15,7 @@ async function loadApp() {
       // It always reloads the page one time to ensure that the Metamask is correctly unlocked in case of the browser's newly opened.
       return setTimeout(function() {
         window.location.replace(window.location.href + '&reloaded=true');
-      }, 1000);
+      }, 3000);
     }
   }
 
@@ -79,8 +79,7 @@ async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
     console.log({ tx });
     displayResponse("Transaction sent.<br><br>Copy to clipboard then continue to App", tx.hash);
   } catch (error) {
-    displayResponse("Transaction Denied");
-    copyToClipboard("error");
+    displayResponse("Transaction Denied.<br><br>Copy to clipboard then continue to App", "error");
   }
 }
 
@@ -91,8 +90,7 @@ async function signMessage(message) {
     console.log({ signature });
     displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
   } catch (error) {
-    displayResponse("Signature Denied");
-    copyToClipboard("error");
+    displayResponse("Signature Denied.<br><br>Copy to clipboard then continue to App", "error");
   }
 }
 
@@ -103,8 +101,7 @@ async function signTypedMessage(types, domain, message) {
     console.log({ signature });
     displayResponse("Signature complete.<br><br>Copy to clipboard then continue to App", signature);
   } catch (error) {
-    displayResponse("Signature Denied");
-    copyToClipboard("error");
+    displayResponse("Signature Denied.<br><br>Copy to clipboard then continue to App", "error");
   }
 }
 
