@@ -8,22 +8,22 @@ let signer;
 document.addEventListener("DOMContentLoaded", loadApp());
 
 async function loadApp() {
+  if (window.location.search.length > 0) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reloaded = urlParams.get("reloaded");
+    if (reloaded === null) {
+      // It always reloads the page one time to ensure that the Metamask is correctly unlocked in case of the browser's newly opened.
+      return setTimeout(function() {
+        window.location.replace(window.location.href + '&reloaded=true');
+      }, 1000);
+    }
+  }
+
   provider = new ethers.providers.Web3Provider(window.ethereum, "any");
   signer = provider.getSigner();
   if (!signer) window.location.reload();
-  await requestAccounts();
+  await provider.send("eth_requestAccounts", []);
   processAction();
-}
-
-async function requestAccounts() {
-  const p1 = provider.send("eth_requestAccounts", []);
-  const p2 = new Promise((_r, rej) => setTimeout(() => rej("timed out"), 20000)); // timeout of 20 seconds
-
-  try {
-    await Promise.race([p1, p2]);
-  } catch (error) {
-    window.location.reload();
-  }
 }
 
 function processAction() {
