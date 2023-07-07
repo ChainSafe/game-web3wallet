@@ -105,6 +105,7 @@ async function copyToClipboard(response) {
     await new Promise((resolve) => setTimeout(resolve, 500));
     // copy tx hash to clipboard
     await navigator.clipboard.writeText(response);
+    document.getElementById("response-button").innerHTML = "Copied";
   } catch {
     // for metamask mobile android
     const input = document.createElement("input");
@@ -114,6 +115,29 @@ async function copyToClipboard(response) {
     input.select();
     document.execCommand("Copy");
     input.style = "visibility: hidden";
+    document.getElementById("response-button").innerHTML = "Copied";
+  }
+}
+
+async function getClipboardPermission() {
+  try {
+    const permissionState = await navigator.permissions.query({name: "clipboard-write"});
+    if (permissionState) return permissionState.state;
+  } catch {
+  }
+  return undefined;
+}
+
+async function writeToClipboard(response) {
+  if (await getClipboardPermission()) {
+    // document.execCommand(‘cut’/‘copy’) is allowed from outside a user-generated event handler as well.
+    copyToClipboard(response);
+  } else {
+    // In case of Firefox
+    // display button to copy tx.hash or signature
+    const responseButton = document.getElementById("response-button");
+    responseButton.className = "active";
+    responseButton.onclick = () => copyToClipboard(response);
   }
 }
 
@@ -124,6 +148,6 @@ function displayResponse(text, response) {
   responseText.className = "active";
 
   if (response) {
-    copyToClipboard(response);
+    writeToClipboard(response);
   }
 }
