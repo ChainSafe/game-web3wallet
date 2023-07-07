@@ -4,6 +4,7 @@ import { parseUnits, hexlify } from "ethers/lib/utils";
 
 let provider;
 let signer;
+let copyButtonNeeded;
 
 document.addEventListener("DOMContentLoaded", loadApp());
 
@@ -12,6 +13,7 @@ async function loadApp() {
   signer = provider.getSigner();
   if (!signer) window.location.reload();
   await provider.send("eth_requestAccounts", []);
+  copyButtonNeeded = (await getClipboardPermission()) === undefined ? true : false;
   processAction();
 }
 
@@ -66,7 +68,7 @@ async function sendTransaction(chainId, to, value, gasLimit, gasPrice, data) {
       data: data ? data : "0x",
     });
     console.log({ tx });
-    displayResponse("Transaction sent.", tx.hash);
+    displayResponse(copyButtonNeeded ? "Transaction sent.<br><br>Copy to clipboard then continue to App": "Transaction sent.", tx.hash);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Transaction Denied");
@@ -78,7 +80,7 @@ async function signMessage(message) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const signature = await signer.signMessage(message);
     console.log({ signature });
-    displayResponse("Signature complete.", signature);
+    displayResponse(copyButtonNeeded ? "Signature complete.<br><br>Copy to clipboard then continue to App": "Signature complete.", signature);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
@@ -90,7 +92,7 @@ async function signTypedMessage(types, domain, message) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const signature = await signer._signTypedData(JSON.parse(domain), JSON.parse(types), JSON.parse(message))
     console.log({ signature });
-    displayResponse("Signature complete.", signature);
+    displayResponse(copyButtonNeeded ? "Signature complete.<br><br>Copy to clipboard then continue to App" : "Signature complete.", signature);
   } catch (error) {
     copyToClipboard("error");
     displayResponse("Signature Denied");
@@ -122,22 +124,24 @@ async function copyToClipboard(response) {
 async function getClipboardPermission() {
   try {
     const permissionState = await navigator.permissions.query({name: "clipboard-write"});
-    if (permissionState) return permissionState.state;
+    if (permissionState) {
+      // document.execCommand(‘cut’/‘copy’) is allowed from outside a user-generated event handler as well.
+      return permissionState.state;
+    }
   } catch {
+    // In case of Firefox
   }
   return undefined;
 }
 
 async function writeToClipboard(response) {
-  if (await getClipboardPermission()) {
-    // document.execCommand(‘cut’/‘copy’) is allowed from outside a user-generated event handler as well.
-    copyToClipboard(response);
-  } else {
-    // In case of Firefox
+  if (copyButtonNeeded) {
     // display button to copy tx.hash or signature
     const responseButton = document.getElementById("response-button");
     responseButton.className = "active";
     responseButton.onclick = () => copyToClipboard(response);
+  } else {
+    copyToClipboard(response);
   }
 }
 
