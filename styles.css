@@ -2,6 +2,10 @@
   font-family: Euclid, sans-serif;
 }
 
+body {
+  background-color: black;
+}
+
 .center {
   display: block;
   text-decoration: none;
@@ -60,5 +64,11 @@
   box-shadow: lightgray 0px 0px 10px;
 }
 
-
-/*# sourceMappingURL=/game-web3wallet/styles.b8fe6877.css.map */
+#developer-credit {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  color: white;
+  font-size: 12px;
+  margin: 10px;
+}
